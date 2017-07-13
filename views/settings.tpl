@@ -1,8 +1,8 @@
 {% extends "main.tpl" %}
 
-{% block title %}app{% end %}
-{% block page_title %}Home Page{% end %}
-{% block subtitle %}... just homepage</panel>{% end %}
+{% block title %}settings{% end %}
+{% block page_title %}Panel setup{% end %}
+{% block subtitle %}Settings of MQTT Panel</panel>{% end %}
 
 {% block content %}
             <h2 class="content-subhead">How to use this layout</h2>

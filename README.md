@@ -1,11 +1,11 @@
-tornado-app
+mqtt-panel
 -
 
-Simple template boilerplate with [Tornado](http://www.tornadoweb.org/en/stable/) and [Pure CSS](https://purecss.io/).
+Simple ...
 
 - Clone
 
-      git clone https://github.com/artekw/tornado-app.git
+      git clone https://github.com/artekw/mqtt-panel.git
 
 - Run
 
