@@ -44,6 +44,14 @@
                 <input id="bg_orange" name="bg_color" type="radio" value="bg_orange">
                 Orange
             </label>
+            <legend>Delay (sec)</legend>
+                <label for="delay"></label>
+                <select id="delay" name="delay">
+                    <option>5</option>
+                    <option>10</option>
+                    <option>20</option>
+                    <option>30</option>
+                </select>
         </fieldset>
         <button type="submit" class="pure-button pure-button-primary">Send it!</button>
     </form>

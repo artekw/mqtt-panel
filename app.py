@@ -6,7 +6,7 @@ import tornado.web
 import tornado.template
 #import tornado.websocket
 
-from display import displayText
+from display import displayText, clock
 
 
 class HomePage(tornado.web.RequestHandler):
@@ -22,10 +22,11 @@ class MessagePage(tornado.web.RequestHandler):
         msg = self.get_argument('msg')
         text_color = self.get_argument('text_color')
         bg_color = self.get_argument('bg_color')
+        delay = self.get_argument('delay')
 
 
         if msg:
-            displayText(5, str(msg), text_color, bg_color)
+            displayText(5, str(msg), text_color, bg_color, delay)
         else:
             print 'err'
         self.render('message.tpl')
@@ -38,6 +39,8 @@ class SettingsPage(tornado.web.RequestHandler):
 
 def make_app():
 
+    clock()
+
     return tornado.web.Application([
         (r'/', HomePage),
         (r'/message', MessagePage),
@@ -48,7 +51,15 @@ def make_app():
     static_path=os.path.join(os.path.dirname(__file__), "static"),
     debug=True)
 
+def update():
+    clock()
+
 if __name__ == "__main__":
     app = make_app()
     app.listen(8888)
-    tornado.ioloop.IOLoop.current().start()
+    mainLoop = tornado.ioloop.IOLoop.current()
+    scheduler = tornado.ioloop.PeriodicCallback(
+        update, 500, io_loop=mainLoop)
+
+    scheduler.start()
+    mainLoop.start()
