@@ -1,20 +1,30 @@
 import os
 import sys
 
+import paho.mqtt.client as mqtt
+
 import tornado.ioloop
 import tornado.web
 import tornado.template
+import tornado.gen
 #import tornado.websocket
+from tornado.queues import Queue
 
 from display import displayText, clock
 
+brokerIP = "192.168.88.245"
+brokerPort = 1883
+
+q = Queue(maxsize=2)
 
 class HomePage(tornado.web.RequestHandler):
+
     def get(self):
         self.render('app.tpl')
 
 
 class MessagePage(tornado.web.RequestHandler):
+
     def get(self):
         self.render('message.tpl')
 
@@ -32,15 +42,35 @@ class MessagePage(tornado.web.RequestHandler):
         self.render('message.tpl')
 
 
+def on_connect(client, obj, flags, rc):
+    print("rc: " + str(rc))
+
+
+@tornado.gen.coroutine
+def on_message(client, obj, msg):
+    #print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+    item = str(msg.payload)
+    yield q.put(item)
+    print('Put %s' % item)
+
+
+def mqtt_run():
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    client.connect(brokerIP, brokerPort, 60)
+    client.subscribe("/sensmon/outnode/temp", 0)
+    client.loop_start()
+
+
 class SettingsPage(tornado.web.RequestHandler):
     def get(self):
         self.render('settings.tpl')
 
 
 def make_app():
-
-    clock()
-
+    mqtt_run()
     return tornado.web.Application([
         (r'/', HomePage),
         (r'/message', MessagePage),
@@ -51,7 +81,17 @@ def make_app():
     static_path=os.path.join(os.path.dirname(__file__), "static"),
     debug=True)
 
+@tornado.gen.coroutine
 def update():
+    if q.qsize():
+        item = yield q.get()
+        try:
+            print('Doing work on %s' % item)
+            displayText(2, item, 'text_green', 'bg_black', 5)
+            yield tornado.gen.sleep(0.01)
+        finally:
+            q.task_done()
+        yield q.join()
     clock()
 
 if __name__ == "__main__":

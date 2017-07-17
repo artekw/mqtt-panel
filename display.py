@@ -31,6 +31,12 @@ def displayText(x, text, text_color, bg_color, delay):
         c_text = interface.GREEN
         c_bg = interface.BLACK
     
+    if not text_color:
+        c_text = interface.GREEN
+    
+    if not bg_color:
+        c_bg = interface.BLACK
+    
     interface.box(0, 0, interface.width(), interface.height(), c_bg)
     for c in text:
         
