@@ -7,7 +7,6 @@ import tornado.ioloop
 import tornado.web
 import tornado.template
 import tornado.gen
-#import tornado.websocket
 from tornado.queues import Queue
 
 from display import displayText, clock
@@ -60,7 +59,7 @@ def mqtt_run():
     client.on_message = on_message
 
     client.connect(brokerIP, brokerPort, 60)
-    client.subscribe("/sensmon/outnode/temp", 0)
+    client.subscribe([("/sensmon/outnode/temp", 0), ("/sensmon/artekroom/temp", 0)])
     client.loop_start()
 
 
@@ -70,6 +69,7 @@ class SettingsPage(tornado.web.RequestHandler):
 
 
 def make_app():
+    # run MQTT loop in background
     mqtt_run()
     return tornado.web.Application([
         (r'/', HomePage),
@@ -83,6 +83,7 @@ def make_app():
 
 @tornado.gen.coroutine
 def update():
+    # if items in queue - display them
     if q.qsize():
         item = yield q.get()
         try:

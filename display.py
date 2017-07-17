@@ -4,7 +4,7 @@ import time
 from ht1632cpy import HT1632C
 
 interface = HT1632C(2, 0)
-interface.pwm(15)
+interface.pwm(5)
 
 def displayText(x, text, text_color, bg_color, delay):
     interface.clear()
