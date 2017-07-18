@@ -3,8 +3,10 @@ import time
 
 from ht1632cpy import HT1632C
 
+import settings
+
 interface = HT1632C(2, 0)
-interface.pwm(5)
+interface.pwm(settings.read('settings', 'matrix', 'brightness'))
 
 def displayText(x, text, text_color, bg_color, delay):
     interface.clear()

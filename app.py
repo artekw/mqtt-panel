@@ -9,10 +9,13 @@ import tornado.template
 import tornado.gen
 from tornado.queues import Queue
 
+import settings
 from display import displayText, clock
 
-brokerIP = "192.168.88.245"
-brokerPort = 1883
+
+brokerIP = settings.read('settings', 'mqtt', 'brokerIP')
+brokerPort = settings.read('settings', 'mqtt', 'brokerPort')
+httpPort = settings.read('settings', 'http', 'port')
 
 q = Queue(maxsize=2)
 
@@ -50,7 +53,7 @@ def on_message(client, obj, msg):
     #print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     item = str(msg.payload)
     yield q.put(item)
-    print('Put %s' % item)
+    # print('Put %s' % item)
 
 
 def mqtt_run():
@@ -87,8 +90,8 @@ def update():
     if q.qsize():
         item = yield q.get()
         try:
-            print('Doing work on %s' % item)
-            displayText(2, item, 'text_green', 'bg_black', 5)
+            # print('Doing work on %s' % item)
+            displayText(2, item + " C", 'text_green', 'bg_black', 5)
             yield tornado.gen.sleep(0.01)
         finally:
             q.task_done()
@@ -97,7 +100,7 @@ def update():
 
 if __name__ == "__main__":
     app = make_app()
-    app.listen(8888)
+    app.listen(httpPort)
     mainLoop = tornado.ioloop.IOLoop.current()
     scheduler = tornado.ioloop.PeriodicCallback(
         update, 500, io_loop=mainLoop)
