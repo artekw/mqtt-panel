@@ -13,3 +13,5 @@ def read(section, *argv):
             for idx, value in enumerate(cfg[section][argv[0]]):
                 if argv[1] in value:
                     return cfg[section][argv[0]][idx][argv[1]]
+        if section == 'feeds':
+            return cfg[section]

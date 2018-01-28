@@ -4,9 +4,21 @@ import time
 from ht1632cpy import HT1632C
 
 import settings
+from lightsensor import getLight
 
 interface = HT1632C(2, 0)
-interface.pwm(settings.read('settings', 'matrix', 'brightness'))
+interface.pwm(settings.read('settings', 'matrix', 'default_brightness'))
+
+
+def dimmer():
+    dimmer_brightness = settings.read('settings', 'matrix', 'dimmer_brightness')
+    default_brightness = settings.read('settings', 'matrix', 'default_brightness')
+
+    if getLight() == False:
+        interface.pwm(dimmer_brightness)
+    else:
+        interface.pwm(default_brightness)
+
 
 def displayText(x, text, text_color, bg_color, delay):
     interface.clear()
@@ -46,6 +58,7 @@ def displayText(x, text, text_color, bg_color, delay):
         x += interface.fontwidth(interface.font6x8)
     interface.sendframe()
     time.sleep(float(delay))
+
 
 def clock():
     now = datetime.datetime.now()

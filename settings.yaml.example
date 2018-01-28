@@ -1,0 +1,22 @@
+feeds:
+  - name: "Out"
+    topic: "/sensmon/outnode/temp"
+    delay: 5
+    priority: 0
+
+  - name: "In"
+    topic: "/sensmon/artekroom/temp"
+    delay: 5
+    priority: 0
+    
+settings:
+  matrix:
+    - dimmer_brightness: 0
+    - default_brightness: 5
+  mqtt:
+    - brokerIP: localhost
+    - brokerPort: 1883
+  http:
+    - port: 8888
+  clock:
+    - format: '%h:%m:%s'

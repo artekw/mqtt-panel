@@ -10,7 +10,7 @@ import tornado.gen
 from tornado.queues import Queue
 
 import settings
-from display import displayText, clock
+from display import displayText, clock, dimmer
 
 
 brokerIP = settings.read('settings', 'mqtt', 'brokerIP')
@@ -50,19 +50,24 @@ def on_connect(client, obj, flags, rc):
 
 @tornado.gen.coroutine
 def on_message(client, obj, msg):
-    #print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+    # print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     item = str(msg.payload)
     yield q.put(item)
     # print('Put %s' % item)
 
 
-def mqtt_run():
+def mqtt_run(): 
+    feeds = settings.read('feeds')
+    print("Follow %s topics") % (len(feeds))
+    feedsTopics = [(f.get('topic'),f.get('priority')) for f in feeds]
+
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
 
     client.connect(brokerIP, brokerPort, 60)
-    client.subscribe([("/sensmon/outnode/temp", 0), ("/sensmon/artekroom/temp", 0)])
+    client.subscribe(feedsTopics)
+
     client.loop_start()
 
 
@@ -86,12 +91,13 @@ def make_app():
 
 @tornado.gen.coroutine
 def update():
+    dimmer()
     # if items in queue - display them
     if q.qsize():
         item = yield q.get()
         try:
             # print('Doing work on %s' % item)
-            displayText(2, item + " C", 'text_green', 'bg_black', 5)
+            displayText(2, item, 'text_green', 'bg_black', 5)
             yield tornado.gen.sleep(0.01)
         finally:
             q.task_done()
