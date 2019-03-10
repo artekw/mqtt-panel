@@ -94,9 +94,9 @@ def make_app():
 
 @tornado.gen.coroutine
 def update():
+    standby = stabdby_mode(standbyFrom, standbyTo)
     if not standby:
         dimmer()
-        standby = stabdby_mode(standbyFrom, standbyTo)
         # if items in queue - display them
         if q.qsize():
             item = yield q.get()
