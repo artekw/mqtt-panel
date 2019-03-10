@@ -17,6 +17,8 @@ from standby import stabdby_mode
 brokerIP = settings.read('settings', 'mqtt', 'brokerIP')
 brokerPort = settings.read('settings', 'mqtt', 'brokerPort')
 httpPort = settings.read('settings', 'http', 'port')
+standbyFrom = settings.read('settings', 'standby', 'from')
+standbyTo = settings.read('settings', 'standby', 'to')
 
 q = Queue(maxsize=2)
 
@@ -92,19 +94,19 @@ def make_app():
 
 @tornado.gen.coroutine
 def update():
-    dimmer()
-    standby = stabdby_mode()
-    # if items in queue - display them
-    if q.qsize():
-        item = yield q.get()
-        try:
-            # print('Doing work on %s' % item)
-            displayText(2, item, 'text_green', 'bg_black', 5)
-            yield tornado.gen.sleep(0.01)
-        finally:
-            q.task_done()
-        yield q.join()
     if not standby:
+        dimmer()
+        standby = stabdby_mode(standbyFrom, standbyTo)
+        # if items in queue - display them
+        if q.qsize():
+            item = yield q.get()
+            try:
+                # print('Doing work on %s' % item)
+                displayText(2, item, 'text_green', 'bg_black', 5)
+                yield tornado.gen.sleep(0.01)
+            finally:
+                q.task_done()
+            yield q.join()
         clock()
 
 if __name__ == "__main__":
