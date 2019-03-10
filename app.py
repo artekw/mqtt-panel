@@ -11,6 +11,7 @@ from tornado.queues import Queue
 
 import settings
 from display import displayText, clock, dimmer
+from standby import stabdby_mode
 
 
 brokerIP = settings.read('settings', 'mqtt', 'brokerIP')
@@ -92,6 +93,7 @@ def make_app():
 @tornado.gen.coroutine
 def update():
     dimmer()
+    standby = stabdby_mode()
     # if items in queue - display them
     if q.qsize():
         item = yield q.get()
@@ -102,7 +104,8 @@ def update():
         finally:
             q.task_done()
         yield q.join()
-    clock()
+    if not standby:
+        clock()
 
 if __name__ == "__main__":
     app = make_app()

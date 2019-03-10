@@ -20,3 +20,6 @@ settings:
     - port: 8888
   clock:
     - format: '%h:%m:%s'
+  standby:
+    - from: 22
+    - to: 7
